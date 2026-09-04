@@ -101,10 +101,10 @@ cells it replaces. So the import fills the screen columns only, and tags them.
 
 | Frontend | Source | welcome | disk | encryption | summary | install | done |
 |----------|--------|---------|------|------------|---------|---------|------|
-| KDE | [capture](https://github.com/tuna-os/tuna-installer-kde/actions/runs/33701301832) | ✅ᶜ | ✅ᶜ | ✅ᶜ | ✅ᶜ | ✅ᶜ | ✅ᶜ |
+| KDE | [capture](https://github.com/tuna-os/tuna-installer-kde/actions/runs/33746041451) | ✅ᶜ | ✅ᶜ | ✅ᶜ | ✅ᶜ | ✅ᶜ | ✅ᶜ |
 | COSMIC | — | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | Niri | [capture](https://github.com/tuna-os/tuna-installer-niri/actions/runs/32732384359) | ✅ᶜ | ✅ᶜ | ✅ᶜ | ✅ᶜ | ✅ᶜ | ✅ᶜ |
-| XFCE | [capture](https://github.com/tuna-os/tuna-installer-xfce/actions/runs/33696928404) | ✅ᶜ | ✅ᶜ | ⬜ᶜ | ✅ᶜ | ✅ᶜ | ✅ᶜ |
+| XFCE | [capture](https://github.com/tuna-os/tuna-installer-xfce/actions/runs/33726957852) | ✅ᶜ | ✅ᶜ | ⬜ᶜ | ✅ᶜ | ✅ᶜ | ✅ᶜ |
 
 ᶜ = GPU-less offscreen capture in the frontend's own repo.
 **It attests to screen parity only.** It drives pages in-process,

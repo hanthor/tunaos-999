@@ -42,56 +42,67 @@ green on 2026-07-23, while the installer GUI had never once been observed.
 
 ## LUKS E2E
 
-**42 of 52** cells green (47 tested, 5 never tested).
+**0 of 52** cells green (50 tested, 2 never tested).
 
 Measured against the set `luks-e2e.yml` schedules: every published desktop image (`build_image`), not only the ones that ship an ISO. That is wider than the ISO matrix below on purpose — the browser ISO builder can make an ISO from any image, so image-only variants (`sailfin`, `guppy`, `flounder-sid`) need boot and install coverage too.
 
 | Variant | gnome | kde | cosmic | niri | xfce |
 |---|:--:|:--:|:--:|:--:|:--:|
-| **albacore** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **bonito** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **bonito-rawhide** | ✅ | ✅ | ✅ | ⬜ | ⬜ |
-| **flounder** | ✅ | ✅ | ❌ | — | ✅ |
-| **flounder-sid** | ✅ | ✅ | — | — | ✅ |
-| **grouper** | ✅ | ✅ | ❌ | — | ✅ |
+| **albacore** | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **bonito** | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **bonito-rawhide** | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **flounder** | ❌ | ❌ | ❌ | — | ❌ |
+| **flounder-sid** | ❌ | ❌ | — | — | ❌ |
+| **grouper** | ❌ | ❌ | ❌ | — | ❌ |
 | **guppy** | ❌ | ❌ | — | — | ❌ |
 | **gurnard** | — | — | — | — | — |
-| **hummingbird** | ❌ | ⬜ | ⬜ | ⬜ | — |
-| **marlin** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **sailfin** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **skipjack** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **yellowfin** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **hummingbird** | ❌ | ⬜ | ❌ | ⬜ | — |
+| **marlin** | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **sailfin** | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **skipjack** | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **wahoo** | ❌ | ❌ | ❌ | — | — |
+| **yellowfin** | ❌ | ❌ | ❌ | ❌ | ❌ |
 
-NVIDIA cells are **out of scope** for this workflow — `luks-e2e.yml` excludes them deliberately, because `-nvidia` takes the identical LUKS path in headless QEMU. 25 stale pre-exclusion result(s) remain from before that change; they are not a gap and will age out.
+NVIDIA cells are **out of scope** for this workflow — `luks-e2e.yml` excludes them deliberately, because `-nvidia` takes the identical LUKS path in headless QEMU. 32 stale pre-exclusion result(s) remain from before that change; they are not a gap and will age out.
 
-The table above still shows a result for `flounder:cosmic`. `.github/build-config.yml` no longer declares that flavour, so `luks-e2e.yml` cannot schedule it and no run will ever turn it green. It is excluded from the count above — a last-measured verdict kept visible, not a gap. Same reasoning as the NVIDIA note.
+The table above still shows a result for `flounder:cosmic`, `wahoo:cosmic`, `wahoo:gnome`, `wahoo:kde`. `.github/build-config.yml` no longer declares those flavours, so `luks-e2e.yml` cannot schedule them and no run will ever turn them green. They are excluded from the count above — a last-measured verdict kept visible, not a gap. Same reasoning as the NVIDIA note.
 
-Newest result 2026-08-07, oldest still-authoritative result 2026-08-05. Results older than the most recent round of fixes are the best available data, not current data.
+Newest result 2026-09-01, oldest still-authoritative result 2026-08-06. Results older than the most recent round of fixes are the best available data, not current data.
 
 ## Installer smoke
 
-**15 of 36** non-NVIDIA ISO cells have *ever* been tested — 42% coverage. 3 of those pass.
+**32 of 36** non-NVIDIA ISO cells have *ever* been tested — 89% coverage. 1 of those pass.
 
-This is the only axis that checks a human could actually install. For 21 combinations, nobody has confirmed the installer appears on screen.
+This is the only axis that checks a human could actually install. For 4 combinations, nobody has confirmed the installer appears on screen.
 
 | Variant | gnome | kde | cosmic | niri | xfce |
 |---|:--:|:--:|:--:|:--:|:--:|
-| **albacore** | ❌ | ❌ | ❌ | ✅ | ❌ |
-| **bonito** | ❌ | ❌ | ❌ | ✅ | ❌ |
-| **bonito-rawhide** | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **flounder** | ⬜ | ⬜ | — | — | — |
-| **grouper** | ⬜ | ⬜ | — | — | ⬜ |
+| **albacore** | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **bonito** | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **bonito-rawhide** | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **build albacore** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **build bonito** | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **build bonito-rawhide** | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **build flounder** | ✅ | ✅ | — | — | — |
+| **build grouper** | ✅ | ✅ | — | — | ✅ |
+| **build gurnard** | — | — | — | — | — |
+| **build hummingbird** | ❌ | — | ❌ | — | — |
+| **build marlin** | ✅ | ✅ | — | — | — |
+| **build skipjack** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **build yellowfin** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **flounder** | ❌ | ⬜ | — | — | — |
+| **grouper** | ❌ | ⬜ | — | — | ⬜ |
 | **gurnard** | — | — | — | — | — |
-| **hummingbird** | ⬜ | ⬜ | ⬜ | ⬜ | — |
-| **marlin** | ⬜ | ⬜ | — | — | — |
-| **skipjack** | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **yellowfin** | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **hummingbird** | ❌ | ❌ | ❌ | ❌ | — |
+| **marlin** | ❌ | ⬜ | — | — | — |
+| **skipjack** | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **yellowfin** | ✅ | ❌ | ❌ | ❌ | ❌ |
 
 cosmic, niri, xfwl4 and kde all need a DRM render node; a ❌ for those on hosted CI may be a harness limitation rather than a product failure. See *Known systemic gaps*.
 
 ## Live overlay
 
-**47** tags published.
+**51** tags published.
 
 Missing for 6 ISO cell(s): `gurnard-pantheon`, `hummingbird-base`, `hummingbird-cosmic`, `hummingbird-gnome`, `hummingbird-kde`, `hummingbird-niri`
 
@@ -101,18 +112,15 @@ The run that last asserted each verdict above. Re-running a cell moves a row her
 
 | Date | Run | Cells |
 |---|---|---|
-| 2026-08-07 | [31144015274](https://github.com/tuna-os/tunaOS/actions/runs/31144015274) | 3 |
-| 2026-08-07 | [31142505455](https://github.com/tuna-os/tunaOS/actions/runs/31142505455) | 1 |
-| 2026-08-07 | [31140248804](https://github.com/tuna-os/tunaOS/actions/runs/31140248804) | 1 |
-| 2026-08-07 | [31140243067](https://github.com/tuna-os/tunaOS/actions/runs/31140243067) | 1 |
-| 2026-08-07 | [31140241727](https://github.com/tuna-os/tunaOS/actions/runs/31140241727) | 1 |
-| 2026-08-07 | [31140234902](https://github.com/tuna-os/tunaOS/actions/runs/31140234902) | 1 |
-| 2026-08-07 | [31139552584](https://github.com/tuna-os/tunaOS/actions/runs/31139552584) | 1 |
-| 2026-08-07 | [31138898336](https://github.com/tuna-os/tunaOS/actions/runs/31138898336) | 1 |
-| 2026-08-07 | [31135980478](https://github.com/tuna-os/tunaOS/actions/runs/31135980478) | 1 |
-| 2026-08-07 | [31135620513](https://github.com/tuna-os/tunaOS/actions/runs/31135620513) | 1 |
-| 2026-08-07 | [31135619058](https://github.com/tuna-os/tunaOS/actions/runs/31135619058) | 1 |
-| 2026-08-07 | [31135530844](https://github.com/tuna-os/tunaOS/actions/runs/31135530844) | 1 |
+| 2026-09-02 | [33634610625](https://github.com/tuna-os/tunaOS/actions/runs/33634610625) | 64 |
+| 2026-09-01 | [33506738063](https://github.com/tuna-os/tunaOS/actions/runs/33506738063) | 125 |
+| 2026-08-24 | [32747410944](https://github.com/tuna-os/tunaOS/actions/runs/32747410944) | 2 |
+| 2026-08-24 | [32718219267](https://github.com/tuna-os/tunaOS/actions/runs/32718219267) | 1 |
+| 2026-08-24 | [32700275124](https://github.com/tuna-os/tunaOS/actions/runs/32700275124) | 1 |
+| 2026-08-21 | [32465179023](https://github.com/tuna-os/tunaOS/actions/runs/32465179023) | 1 |
+| 2026-08-19 | [32238167029](https://github.com/tuna-os/tunaOS/actions/runs/32238167029) | 38 |
+| 2026-08-12 | [31585741267](https://github.com/tuna-os/tunaOS/actions/runs/31585741267) | 18 |
+| 2026-08-06 | [31087927879](https://github.com/tuna-os/tunaOS/actions/runs/31087927879) | 1 |
 
 <!-- END GENERATED -->
 

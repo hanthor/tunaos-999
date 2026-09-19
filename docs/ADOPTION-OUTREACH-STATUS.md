@@ -3,10 +3,10 @@
 **As of:** 2026-08-14
 **Owner:** strategist, with maintainer approval for external contact
 
-This is an evidence ledger, not a prospect list. It deliberately separates
-prepared material from outreach that was actually sent. No organization is
-listed as a TunaOS adopter without consent-confirmed public evidence in
-[ADOPTERS.md](../ADOPTERS.md).
+This is an evidence ledger, not a prospect list. On purpose, it keeps the
+material we prepared apart from the outreach we sent. This project lists an
+organization as a TunaOS adopter only when [`ADOPTERS.md`](../ADOPTERS.md)
+holds public evidence with the confirmed consent of that organization.
 
 | Channel | Prepared material | Sent? | Evidence / next action |
 |---|---|---|---|
@@ -18,9 +18,9 @@ listed as a TunaOS adopter without consent-confirmed public evidence in
 
 ## Update rules
 
-- Replace **No** only with a date and a durable public evidence link.
-- Record no-response and declined outreach without converting it into an
-  adopter count.
+- Replace **No** only with a date and a link to durable public evidence.
+- Record outreach that got no answer, and outreach that the recipient
+  declined. Do not count either one as an adopter.
 - Keep production, development/evaluation, and anonymous reports as separate
   measures.
 - Do not use stars, downloads, image pulls, CI jobs, or ecosystem rows as

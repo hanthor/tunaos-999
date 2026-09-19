@@ -1,12 +1,13 @@
 # Secure Boot support by variant
 
-Short version: **the Enterprise-Linux and Fedora variants (Yellowfin,
-Albacore, Skipjack, Bonito, and Redfin) boot under Secure Boot out of the
-box** because they inherit the distro-signed shim and kernel from their
-bootc base images.
-**Everything NVIDIA needs one manual key enrollment**, and the
-**community-base variants (Marlin, Flounder, Grouper, Sailfin, Guppy) do
-not support Secure Boot out of the box today**.
+In short: **the Enterprise-Linux and Fedora variants boot under Secure Boot
+out of the box**. Those are Yellowfin, Albacore, Skipjack, Bonito, and Redfin.
+They take the shim and the kernel, both signed by the distro, from their bootc
+base images.
+
+**Every NVIDIA flavor needs you to enroll one key by hand**. Five variants sit
+on a community base: Marlin, Flounder, Grouper, Sailfin, and Guppy. **None of
+them supports Secure Boot out of the box today**.
 
 "Out of the box" means: install, reboot with Secure Boot enabled, and
 everything works — no firmware settings changed, no keys enrolled.
@@ -32,11 +33,11 @@ everything works — no firmware settings changed, no keys enrolled.
 
 ## NVIDIA flavors
 
-All `*-nvidia` flavors (every variant) install the NVIDIA open kernel
-modules from Universal Blue's `akmods-nvidia-open` packages. Those
-modules are signed with the **Universal Blue akmods MOK key**, not a key
-your firmware trusts, so under Secure Boot the system boots but the
-NVIDIA driver is blocked until you enroll the key once:
+Every `*-nvidia` flavor, on every variant, installs the open NVIDIA kernel
+modules from Universal Blue's `akmods-nvidia-open` packages. Universal Blue
+signs those modules with its own **MOK key for akmods**. Your firmware does not
+trust that key. So under Secure Boot the system boots, but it holds the NVIDIA
+driver back until you enroll the key once:
 
 ```bash
 ujust enroll-secure-boot-key   # if available on your image
@@ -44,24 +45,24 @@ ujust enroll-secure-boot-key   # if available on your image
 sudo mokutil --import /etc/pki/akmods/certs/akmods-ublue.der
 ```
 
-Reboot, and in the blue MOK Manager screen choose *Enroll MOK* →
-*Continue* and enter the password (`universalblue` for the Universal
-Blue key). This is a one-time step per machine.
+Reboot. On the blue screen of the MOK Manager, choose *Enroll MOK*, then
+*Continue*, then enter the password. For the key from Universal Blue that
+password is `universalblue`. You do this once on each machine.
 
 ## Migrated systems
 
-Migrating an existing install to TunaOS (see
-[MIGRATION.md](../MIGRATION.md)) keeps your firmware state; the same
-table applies, and NVIDIA flavors need the MOK enrollment on first boot
-after migration.
+A move from an existing install to TunaOS (see
+[`MIGRATION.md`](../MIGRATION.md)) keeps the state of your firmware. The same
+table applies. On an NVIDIA flavor, enroll the MOK on the first boot after the
+move.
 
 ## What "not out of the box" means practically
 
-- **Marlin / Guppy**: disable Secure Boot in firmware. There is no
-  supported signing path today.
-- **Flounder / Grouper / Sailfin**: disable Secure Boot. These bases
-  have distro signing upstream, so wiring shim + signed kernels through
-  the bootcification is possible future work — tracked per-variant, not
-  promised.
-- If a variant table row here disagrees with what you observe on real
-  hardware, that is a bug in this document — please file an issue.
+- **Marlin / Guppy**: disable Secure Boot in the firmware. This project
+  supports no path to a signed kernel for them today.
+- **Flounder / Grouper / Sailfin**: disable Secure Boot. Each of these bases
+  has a signed kernel upstream. To carry the shim and the signed kernel
+  through the move to bootc is therefore possible. It is future work. We
+  track it for each variant, and we promise nothing.
+- A row in the table above can disagree with what you see on real hardware.
+  That is a defect in this document. Please file an issue.

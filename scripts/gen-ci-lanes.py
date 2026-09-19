@@ -132,11 +132,12 @@ def render(workflows=None, asserted=None) -> str:
         "## Executing workflow lanes",
         "",
         (
-            "This inventory is generated from workflow triggers and "
-            "`.github/green-criteria.yml`; run `scripts/gen-ci-lanes.py` after "
-            "changing either. **PR-deterministic** is fast contributor feedback. "
-            "**Post-merge** publishes or reacts to trusted repository events. "
-            "**Scheduled** independently revalidates state and freshness."
+            "`scripts/gen-ci-lanes.py` writes this inventory from the workflow "
+            "triggers and from `.github/green-criteria.yml`. Run it again after "
+            "you change either one. **PR-deterministic** gives a contributor "
+            "fast feedback. **Post-merge** publishes, or answers a repository "
+            "event that we trust. **Scheduled** checks the state and the "
+            "freshness again, on its own."
         ),
         "",
         "| Workflow | Lane | Assertion | Cadence | Freshness SLA |",

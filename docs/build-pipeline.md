@@ -1,10 +1,10 @@
 # TunaOS Build Pipeline Guide
 
-This document provides an overview of the CI/CD pipeline for TunaOS. The
-pipeline builds images on staggered schedules and publishes them with
-per-flavor tags after the required verification jobs pass. For the detailed,
-maintained architecture, see [PIPELINE.md](PIPELINE.md) and the
-[Developer Guide](DEVELOPER-GUIDE.md).
+This document gives an overview of the CI/CD pipeline for TunaOS. The
+pipeline builds images on schedules that do not overlap. It then publishes them
+under a tag for each flavor, after the jobs that verify them pass. For the
+architecture in detail, and kept current, see [`PIPELINE.md`](PIPELINE.md) and
+the [Developer Guide](DEVELOPER-GUIDE.md).
 
 ## 🏗️ Architecture Overview
 
@@ -16,11 +16,12 @@ not represent all desktops; each flavor has its own tag.
 ### Variants
 
 `.github/build-config.yml` is the source of truth for the build matrix. Do not
-copy a static subset from this page into automation: variants and their flavor,
-platform, ISO, and QCOW2 availability are declared there. The generated
-[Matrix Status](MATRIX-STATUS.md) provides the current per-cell verification
-view, and the root [README](../README.md#choose-your-image) summarizes the
-published and local-build-only images for readers choosing a base.
+copy a fixed subset of this page into automation. That file declares each
+variant, and which flavors, platforms, ISOs and QCOW2 images it offers. The
+generated [Matrix Status](MATRIX-STATUS.md) shows the current state of
+verification for each cell. The root [README](../README.md#choose-your-image)
+helps a reader pick a base. It lists the published images, and the images you
+can build only on your own machine.
 
 ### Flavors (4-stage DAG; source of truth: `.github/build-config.yml`)
 
@@ -43,7 +44,7 @@ Desktop HWE images (`<de>-hwe`) layer on the corresponding desktop image in
 stage 3. NVIDIA images (`<de>-nvidia`) do the same. Both paths use
 `Containerfile.overlay`; `OVERLAY_TYPE` selects the hardware layer and
 `PARENT_FLAVOR` identifies the desktop parent. The stage-2 `base-hwe` and
-`base-nvidia` cells remain independently buildable base images.
+`base-nvidia` cells stay base images that you can build on their own.
 
 ---
 
@@ -67,21 +68,22 @@ points and the manual `build-flavor.yml` dispatcher.
   5. **Stage 4** (`build_stage4`): builds `gnome-nvidia-hwe` — runs after all stage 3 complete
   6. **Artifacts** (`build_artifacts_s2`, `build_artifacts_s3`, `build_artifacts_s4`): per-stage artifact jobs build ISOs (via `just iso-tacklebox`) and QCOW2s for combo cells where `build_iso: true` / `build_qcow2: true`. Each stage's artifacts depend only on that stage's image builds.
 - **Key Features**:
-  - **DAG enforcement**: jobs use `needs` to enforce stage ordering; within a stage, `fail-fast: false`
+  - **DAG enforcement**: jobs use `needs` to hold the stages in order. Inside a stage, `fail-fast: false`
   - **Multi-platform artifacts**: `linux/amd64` and `linux/arm64` ISO/QCOW2 matrices per stage for multi-arch variants (#1378)
-  - **Cosign signing + SBOM** with transient error retry and deadline backoff for all published images (#1377)
+  - **Cosign signatures + SBOM** for every published image. A transient error causes a retry, and the backoff runs against a deadline (#1377)
   - Pull-request builds do not promote user-facing tags
 
 ### 2. Pull Request Checks
 
-Pull requests run the repository's validation workflows and any selected image
-build lane without promoting user-facing tags. The exact selection logic lives
-in the workflow files and CI contract tests; it is intentionally not duplicated
-as a static flavor list here.
+A pull request runs the repository's validation workflows, plus whichever
+image build lane the rules select. It never promotes a user-facing tag. The
+workflow files and the CI contract tests hold the exact rules that make that
+choice. On purpose, this page does not repeat them as a fixed list of
+flavors.
 
-The legacy monolithic `build.yml` (and its `generate-release.yml` companion)
-were removed in 2026-09; `git log --all -- .github/workflows/archive/` has
-them if the history is needed.
+A change in 2026-09 deleted the old single-file `build.yml` and its
+companion `generate-release.yml`. To read them, run
+`git log --all -- .github/workflows/archive/`.
 
 ---
 
@@ -89,14 +91,14 @@ them if the history is needed.
 
 The pipeline relies on several helper scripts in the `scripts/` directory and Justfile recipes:
 
-- **`reusable-build-image.yml`**: Shared CI job for image build, multi-arch
-  manifest assembly, signing, SBOM generation, candidate verification, and
-  promotion.
-- **`generate_matrix`** (in `build-variant.yml`): `yq` + `jq` pipeline that reads `build-config.yml` and emits per-stage JSON matrices.
-- **`build-iso-tacklebox.sh`** + `just iso-tacklebox`: Go-based bootc→ISO builder using `ghcr.io/tuna-os/tacklebox`. Replaces the legacy anaconda-based ISO path.
+- **`reusable-build-image.yml`**: the shared CI job. It builds the image,
+  assembles the multi-arch manifest, signs it, makes the SBOM, verifies the
+  candidate, and promotes it.
+- **`generate_matrix`** (in `build-variant.yml`): a `yq` and `jq` pipeline. It reads `build-config.yml` and emits one matrix, in JSON, for each stage.
+- **`build-iso-tacklebox.sh`** + `just iso-tacklebox`: a bootc-to-ISO builder in Go, on `ghcr.io/tuna-os/tacklebox`. It replaces the old ISO path that used anaconda.
 - **`iso-e2e.sh`**: QEMU+OVMF+KVM end-to-end harness for ISO and installed-disk
   checks; it captures screenshots and serial logs and validates readiness.
-- **`dnf_retry`** (in `build_scripts/lib.sh`): Retries transient EPEL/RPM fetch failures up to 4 attempts with exponential backoff.
+- **`dnf_retry`** (in `build_scripts/lib.sh`): retries a transient EPEL or RPM fetch failure, up to 4 times, with a backoff that doubles.
 
 ---
 

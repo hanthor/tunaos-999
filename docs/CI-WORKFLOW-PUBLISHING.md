@@ -11,12 +11,12 @@ refusing to allow a GitHub App to create or update workflow
 
 ## What the error means
 
-GitHub treats files under `.github/workflows/` as a protected write surface.
-The token's ordinary repository `contents: write` access is not enough: the
-specific GitHub App installation must also have the App-level **Workflows: Read
-and write** permission. A workflow YAML `permissions:` block cannot grant that
-permission, and changing the repository branch protection settings does not
-work around it.
+GitHub protects every file under `.github/workflows/` against a write. The
+ordinary `contents: write` access of the token is not enough. That one
+installation of the GitHub App must also hold the **Workflows: Read and
+write** permission, at the level of the App. No `permissions:` block in a
+workflow can grant it. A change to how the repository protects its branches
+does not get around it either.
 
 The failure happens during `git push`, before a pull request exists. A normal
 non-workflow commit may push successfully with the same token, which can make
@@ -27,20 +27,21 @@ the installation look healthy when it is not.
 Two parties may need to act, in this order:
 
 1. The App owner opens the App settings, edits **Repository permissions →
-   Workflows**, selects **Read and write**, and submits the permission change.
-2. An organization administrator opens the organization's installed-app
-   configuration, selects the hive App, and approves the pending permission
-   request. If the App was reinstalled or its permissions were reset, GitHub
-   shows the approval banner there instead of applying the App change
-   automatically.
-3. Retry a small, already-reviewed workflow-fix branch. Verify that the push
-   reaches the fork and that the resulting PR contains the workflow diff; do
-   not use a test commit on `main`.
+   Workflows**, selects **Read and write**, and sends the change.
+2. An administrator of the organization opens the settings for the installed
+   apps. There they select the hive App, and approve the request that waits
+   for them. GitHub shows the approval banner on that page when somebody has
+   installed the App again, or has reset its permissions. In that case GitHub
+   does not apply the change to the App on its own.
+3. Try again with a small branch that fixes a workflow, and that somebody has
+   already reviewed. Verify that the push reaches the fork, and that the new
+   PR holds the diff of the workflow. Do not use a test commit on `main`.
 
-If the organization denies the request, record that decision in the tracking
-issue and route workflow changes through an approved human or App installation
-with `workflows` write access. Keep the patch in the PR or issue discussion
-until the replacement route is confirmed.
+If the organization refuses the request, record that decision in the issue
+that tracks it. Then send each change to a workflow through an
+approved route. That route is a person, or an installation of an App, with
+write access to `workflows`. Keep the patch in the PR, or in the
+discussion on the issue, until you know that the other route works.
 
 ## Triage checklist for a rejected push
 
@@ -48,21 +49,26 @@ until the replacement route is confirmed.
   in the issue.
 - Confirm the branch contains only the intended workflow change with
   `git diff upstream/main...HEAD -- .github/workflows/`.
-- Test whether a non-workflow branch push succeeds; this distinguishes the App
-  permission problem from ordinary fork authentication or branch protection.
-- Check App-level permission and organization-installation approval separately;
-  changing only one side may leave the installation in a pending state.
-- Link the replacement PR and close the incident only after the workflow file
-  is visible in the PR and its checks start.
+- Push a branch that touches no workflow, and see whether that succeeds. A
+  push that works points at the permission on the App. A push that fails
+  points at the authentication of the fork, or at the protection of the
+  branch.
+- Check the permission on the App. Then check, apart from it, the approval on
+  the installation in the organization. A change to only one of the two can
+  leave the installation in a state that waits.
+- Link the replacement PR. Close the incident only after the PR shows the
+  workflow file, and its checks start.
 
 ## Current incident references
 
 - [#1557](https://github.com/tuna-os/tunaos/issues/1557) — hive App missing
   `workflows` permission.
-- [#1390](https://github.com/tuna-os/tunaos/issues/1390) — Catalog Facts
-  checkout fix, later routed through [PR #1484](https://github.com/tuna-os/tunaos/pull/1484).
-- [#1430](https://github.com/tuna-os/tunaos/issues/1430) — Bootc Lifecycle
-  matrix fix, later routed through [PR #1519](https://github.com/tuna-os/tunaos/pull/1519).
+- [#1390](https://github.com/tuna-os/tunaos/issues/1390) — a fix to the
+  checkout in Catalog Facts, which later went through
+  [PR #1484](https://github.com/tuna-os/tunaos/pull/1484).
+- [#1430](https://github.com/tuna-os/tunaos/issues/1430) — a fix to the matrix
+  in Bootc Lifecycle, which later went through
+  [PR #1519](https://github.com/tuna-os/tunaos/pull/1519).
 
-This runbook documents the access-recovery path; it does not claim that a
-repository commit can grant an App permission.
+This runbook gives the path back to access. It does not claim that a commit in
+the repository can grant a permission to an App.

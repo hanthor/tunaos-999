@@ -11,9 +11,10 @@ desktop-parity audit against:
   source [`tuna-os/docs` `static/iso-index.json`](https://github.com/tuna-os/docs/blob/main/static/iso-index.json)
   (generated from the `download.tunaos.org` R2 bucket).
 
-This is the bounded documentation-parity audit requested in
-[tuna-os/tunaos#1308](https://github.com/tuna-os/tunaos/issues/1308) (context:
-[tuna-os/tunaos#1294](https://github.com/tuna-os/tunaos/issues/1294)).
+This is the audit of parity in the documentation that
+[tuna-os/tunaos#1308](https://github.com/tuna-os/tunaos/issues/1308) asks for,
+and it goes no wider than that. For the context, see
+[tuna-os/tunaos#1294](https://github.com/tuna-os/tunaos/issues/1294).
 
 ## Sources of truth
 
@@ -28,24 +29,25 @@ This is the bounded documentation-parity audit requested in
 
 ## The audit's edition count (37 vs 40)
 
-The #133 title reads "24 of 37 published editions". Its size matrix enumerates
-**40 published desktop images** (the `–` cells are not published), of which
-**24 are flagged suspect** (bold in the matrix). The matrix is the audit's
-primary data, so this checklist follows it and enumerates all 40.
+The #133 title reads "24 of 37 published editions". Its size matrix lists
+**40 published desktop images**; the `–` cells hold no published image. The
+matrix flags **24 of those 40 as suspect**, in bold. The matrix is the primary
+data of the audit, so this checklist obeys it and lists all 40.
 
-The 3-image difference between the headline "37" and the matrix's 40 coincides
-with the three EL10 XFCE images (`albacore:xfce`, `yellowfin:xfce`,
-`skipjack:xfce`): they were measured on GHCR and flagged thin, and they are the
-three editions the tunaos.org catalog does **not** list — `variants.ts` filters
-XFCE out of the EL10 trio pending
-[tunaos-packages#65](https://github.com/tuna-os/tunaos-packages/issues/65).
-They are marked in the checklist below.
+Three images explain the step from the headline "37" to the matrix's 40:
+the XFCE images of the three EL10 variants (`albacore:xfce`, `yellowfin:xfce`,
+`skipjack:xfce`). The audit measured them on GHCR and flagged them as thin,
+and the tunaos.org catalog does **not** list them. `variants.ts` keeps XFCE
+out of the EL10 trio until
+[tunaos-packages#65](https://github.com/tuna-os/tunaos-packages/issues/65)
+closes. The checklist below marks all three.
 
 ## Audit matrix (source of truth)
 
-Reproduced verbatim from tunaos-packages#133 (GB, summed compressed layer
-sizes, amd64, 2026-07-30). **Bold** = desktop adds < 0.45 GB over its own
-`:base` (the audit's suspect flag).
+Copied word for word from tunaos-packages#133. Each figure is the sum, in GB,
+of the compressed sizes of the layers, on amd64, on 2026-07-30. **Bold** = the
+desktop adds less than 0.45 GB over its own `:base`, which is the flag the
+audit uses for a suspect image.
 
 | variant | base | gnome | kde | cosmic | niri | xfce |
 |---|---|---|---|---|---|---|
@@ -61,9 +63,9 @@ sizes, amd64, 2026-07-30). **Bold** = desktop adds < 0.45 GB over its own
 
 ## Variant pages
 
-Every variant in the audit has a tunaos.org landing page. The "desktops
-listed" column is what `variants.ts` exposes on that page — the column where
-the gaps below show up.
+Every variant in the audit has a page of its own on tunaos.org. The
+"desktops listed" column holds what `variants.ts` puts on that page. The gaps
+below show up in that column.
 
 | Variant | tunaos.org variant page | Desktops listed on page | Audit desktops published |
 |---|---|---|---|
@@ -133,8 +135,8 @@ Legend: **Page lists desktop** — does the variant page expose that desktop
 
 ### 1. Missing variant-page listing (published, but no desktop row on the page)
 
-Three editions are published on GHCR and measured in #133, but their variant
-page does not list the desktop:
+GHCR holds three editions that #133 measured, but the page for their variant
+does not list the desktop:
 
 | Edition | Why |
 |---|---|
@@ -142,12 +144,12 @@ page does not list the desktop:
 | `yellowfin:xfce` | same |
 | `skipjack:xfce` | same |
 
-All three were flagged **suspect (thin)** in #133.
+#133 flagged all three as **suspect (thin)**.
 
 ### 2. Stale variant-page listing (page lists an edition that is no longer built)
 
-Three editions are still listed on their variant page but were removed from
-`build-config.yml` after #133:
+Three editions still appear on the page for their variant, but a change to
+`build-config.yml` after #133 dropped them:
 
 | Edition | Why |
 |---|---|
@@ -165,16 +167,16 @@ Editions with no ISO surfaced in `iso-index.json` (the download page's source):
   `skipjack` kde/cosmic/niri/xfce, `marlin` cosmic/niri/xfce,
   `flounder` kde — 11 editions.
 
-Several of these have `build_iso: true` in `.github/build-config.yml`, but the
-community desktop ISO group is declared `publish: false` (only the default
-GNOME group is published as `<variant>.iso`), and no per-desktop ISO reaches the
-R2 index for them. The browser ISO builder (`iso.tunaos.org`) can still produce
+Several of these carry `build_iso: true` in `.github/build-config.yml`. But
+the ISO group for the community desktops declares `publish: false`, so only
+the default GNOME group goes out as `<variant>.iso`. No ISO for one desktop
+reaches the R2 index for them. The browser ISO builder (`iso.tunaos.org`) can still produce
 on-demand ISOs from the published OCI images.
 
 ## Regenerating
 
-The catalog and download columns above are derived from live sources, not
-hand-maintained numbers:
+Live sources give the catalog and download columns above. Nobody keeps
+those numbers by hand:
 
 * Variant-page listings: `tuna-os/docs` → `src/data/variants.ts`.
 * Download links: `tuna-os/docs` → `static/iso-index.json` (refreshed by the

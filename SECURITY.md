@@ -2,10 +2,10 @@
 
 ## Supported Versions
 
-TunaOS images are built daily with weekly ISO publications. Images are
-published with per-flavor tags (e.g. `gnome`, `kde`, `gnome-hwe`).
-Only the most recent build of each flavor is actively supported.
-See [VERSIONING.md](VERSIONING.md) for the full tagging scheme.
+CI builds the TunaOS images every day, and publishes an ISO every week. Each
+image goes out under a tag for its flavor, for example `gnome`, `kde`, or
+`gnome-hwe`. This project supports only the newest build of each flavor.
+See [`VERSIONING.md`](VERSIONING.md) for the whole tag scheme.
 
 | Variant | Base OS | Status |
 |---|---|---|
@@ -34,34 +34,38 @@ You can expect:
 
 TunaOS images are:
 - Built in CI from pinned base images (see `image-versions.yaml`)
-- Signed keylessly with [Sigstore Cosign](https://github.com/sigstore/cosign)
-  using the protected TunaOS GitHub Actions workflow identity
-- Scanned for vulnerabilities via GitHub's built-in scanning
-- Published with signed SPDX SBOM attestations
+- Signed keylessly by [Sigstore Cosign](https://github.com/sigstore/cosign),
+  under the identity of the protected TunaOS workflow in GitHub Actions
+- Examined for vulnerabilities by the scanner that GitHub supplies
+- Published with attestations in SPDX, each one an SBOM that Cosign signed
 
-There is no long-lived TunaOS signing key or password to leak or rotate.
-Fulcio issues a short-lived certificate for the GitHub Actions OIDC identity,
-and the signature is recorded in Sigstore's transparency infrastructure. See
-[`docs/VERIFY-ARTIFACTS.md`](docs/VERIFY-ARTIFACTS.md) for verification commands.
+TunaOS holds no long-lived key and no password that anyone could leak, and
+that nobody must rotate. Fulcio issues a short-lived certificate against the
+OIDC identity from GitHub Actions, and Sigstore's transparency log keeps a
+record of the signature. See
+[`docs/VERIFY-ARTIFACTS.md`](docs/VERIFY-ARTIFACTS.md) for the commands that
+verify an artifact.
 
 ## Supply Chain Security
 
 - Base images pinned by digest in `image-versions.yaml`
-- Third-party GitHub Actions pinned to commit SHAs
-- Release promotion requires successful keyless signature and SBOM-attestation
-  verification against the expected repository workflow and protected ref
-- Build secrets use BuildKit secret mounts, never environment variables
-- Workflow credentials must not be embedded in URLs; use header-based Git
-  authentication (for example, `http.extraheader`) when a private checkout
-  is required
+- Each Action from a third party pinned to a commit SHA
+- No release goes out until two checks pass: the keyless signature, and the
+  SBOM attestation. Both must verify against the workflow and the protected
+  ref that we expect
+- Build secrets use the secret mounts of BuildKit, never an environment
+  variable
+- Never put a credential for a workflow into a URL. When a checkout needs a
+  private credential, put it in a Git header instead, for example with
+  `http.extraheader`
 - RPM packages from official AlmaLinux/CentOS/Fedora repositories and verified COPRs
 
 ## Disclosure Policy
 
 We follow coordinated disclosure:
-1. Reporter submits vulnerability privately
-2. We investigate and develop a fix
-3. Fix is deployed to new builds
-4. Advisory is published after deployment
+1. The reporter sends us the vulnerability in private
+2. We investigate it and write a fix
+3. The next builds carry that fix
+4. We publish the advisory after those builds go out
 
 See [`docs/AGENT_GUIDE.md`](docs/AGENT_GUIDE.md) for full build architecture details.

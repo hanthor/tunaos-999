@@ -14,7 +14,7 @@ Issues and PRDs for this repo live as GitHub issues. Use the `gh` CLI for all op
   EOF
   ```
 
-- **Read an issue**: `gh issue view <number> --comments`, filtering comments by `jq` and also fetching labels.
+- **Read an issue**: `gh issue view <number> --comments`. Send the comments through `jq` to filter them, and get the labels too.
 - **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
 - **Comment on an issue**: use the same stdin pattern:
 
@@ -25,15 +25,15 @@ Issues and PRDs for this repo live as GitHub issues. Use the `gh` CLI for all op
   ```
 
 - **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
-- **Close**: add a closing explanation with the safe comment form above, then run `gh issue close <number>`.
+- **Close**: add an explanation with the safe comment form above, then run `gh issue close <number>`.
 
 ### Markdown is never a shell argument
 
-Never put generated or authored Markdown directly in `--body`, `--comment`, or
-a double-quoted shell variable assignment. Backticks, `$(...)`, and `$VARIABLE`
-are shell syntax: the shell evaluates them before `gh` sees the text and can
-splice credentials or command output into a public issue. Escaping backticks
-alone is not sufficient.
+Never put Markdown, written by hand or by a tool, directly in `--body`, in
+`--comment`, or in a shell variable that you assign inside double quotes.
+Backticks, `$(...)`, and `$VARIABLE` are shell syntax: the shell evaluates them
+before `gh` sees the text, and can put credentials or command output into a
+public issue. It is not enough to escape the backticks.
 
 Use `--body-file -` and a **single-quoted heredoc delimiter** (`<<'EOF'`) so the
 shell performs no command, parameter, or backslash expansion. A temporary file

@@ -1,18 +1,22 @@
 # Unified CI/CD Workflow Specification
 
-> **⚠️ This is a target/aspirational specification — the current implementation differs.**
-> The pipeline has evolved during implementation. See [`build-pipeline.md`](build-pipeline.md)
-> for the currently deployed architecture. Key differences from this spec:
-> - **Orchestrator**: \`build-variant.yml\` (not \`main-build.yml\`)
-> - **Matrix generation**: \`generate_matrix\` job (not \`detect_changes\`)
-> - **Artifact jobs**: Per-stage \`build_artifacts_s{2,3,4}\` (not single \`build_artifacts\`)
-> - **Composite actions**: Single \`build-artifacts\` action (not three separate actions)
+> **⚠️ This is a target specification — the implementation differs from it.**
+> The pipeline changed while the team built it. See [`build-pipeline.md`](build-pipeline.md)
+> for the architecture now in place.
+
+The implementation differs from this spec in four places:
+
+- **Orchestrator**: `build-variant.yml`, not `main-build.yml`.
+- **Matrix generation**: the `generate_matrix` job, not `detect_changes`.
+- **Artifact jobs**: one job per stage, `build_artifacts_s{2,3,4}`, not a
+  single `build_artifacts`.
+- **Composite actions**: one `build-artifacts` action, not three actions.
 
 <!-- BEGIN GENERATED CI LANES — scripts/gen-ci-lanes.py -->
 
 ## Executing workflow lanes
 
-This inventory is generated from workflow triggers and `.github/green-criteria.yml`; run `scripts/gen-ci-lanes.py` after changing either. **PR-deterministic** is fast contributor feedback. **Post-merge** publishes or reacts to trusted repository events. **Scheduled** independently revalidates state and freshness.
+`scripts/gen-ci-lanes.py` writes this inventory from the workflow triggers and from `.github/green-criteria.yml`. Run it again after you change either one. **PR-deterministic** gives a contributor fast feedback. **Post-merge** publishes, or answers a repository event that we trust. **Scheduled** checks the state and the freshness again, on its own.
 
 | Workflow | Lane | Assertion | Cadence | Freshness SLA |
 |---|---|---|---|---|
@@ -95,8 +99,9 @@ This inventory is generated from workflow triggers and `.github/green-criteria.y
 <!-- END GENERATED CI LANES -->
 
 ## Overview
-This specification defines the target design for the matrix-driven CI/CD pipeline
-for TunaOS, consolidating redundant workflows and optimizing the build process.
+This specification gives the target design for the CI/CD pipeline of TunaOS,
+which a matrix drives. The design merges workflows that duplicate each other,
+and makes the build faster.
 
 ## Central Configuration (`.github/build-config.yml`)
 A single YAML file will serve as the source of truth for all buildable variants, flavors, and platforms.
@@ -126,7 +131,7 @@ variants:
 ## Workflow Architecture (`.github/workflows/main-build.yml`)
 
 ### Jobs:
-1. **`detect_changes`**: Analyzes commit paths to determine which variants and flavors require rebuilding.
+1. **`detect_changes`**: reads the paths in the commit, and decides which variants and flavors the pipeline must build again.
 2. **`generate_matrix`**:
     - Reads `.github/build-config.yml`.
     - Merges with manual inputs (for `workflow_dispatch`).
@@ -144,9 +149,9 @@ variants:
 ## Composite Actions
 - **`actions/setup-tunaos`**: Handles `just`, `podman`, and `yq` installation.
 - **`actions/build-image`**: Executes the `just build` command with proper arguments.
-- **`actions/publish-image`**: Manages rechunking, SBOM generation, and signing.
+- **`actions/publish-image`**: controls the rechunk step, makes the SBOM, and signs the image.
 
 ## Benefits
-- **Maintainability**: Adding a new variant or flavor only requires updating the YAML config.
-- **Efficiency**: Parallel matrix builds reduce total CI time.
-- **Consistency**: All flavors use the same underlying build and publish logic.
+- **Maintainability**: to add a variant or a flavor, you need only edit the YAML config.
+- **Efficiency**: parallel builds across the matrix cut the total time in CI.
+- **Consistency**: every flavor uses the same logic to build and to publish.

@@ -1,3 +1,5 @@
+<!-- ste-disable-file: the Contributor Covenant v2.1, reproduced word for word; rewriting it would misquote the document this community adopted -->
+
 # Contributor Covenant Code of Conduct
 
 ## Our Pledge

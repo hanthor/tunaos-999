@@ -6,9 +6,9 @@ guides, variant overviews, system requirements, and companion-project docs all
 live there. That is the canonical, user-facing home; this folder is **not**
 mirrored to it.
 
-The old in-repo mdBook (`docs/book/`) was removed once tunaos.org went live — it
-duplicated the same user-facing content. (Its GitHub Pages deploy workflow was
-already retired separately.)
+We deleted the old in-repo mdBook (`docs/book/`) once tunaos.org went live — it
+duplicated the same user-facing content. (A separate change had already retired
+its deploy workflow for GitHub Pages.)
 
 ## What's in this folder
 
@@ -94,25 +94,25 @@ user-facing site:
 
 ## Policies & planning (repo root)
 
-These live at the repository root rather than in this folder:
+These live at the repository root, not in this folder:
 
-- [ROADMAP.md](../ROADMAP.md) — project direction and feature status
-- [VISION.md](../VISION.md) — project philosophy
-- [GOAL.md](../GOAL.md) — current objective
-- [CONTRIBUTING.md](../CONTRIBUTING.md) — how to set up, build, and contribute
-- [VARIANT-LIFECYCLE.md](../VARIANT-LIFECYCLE.md) — Stable/Beta/Alpha admission gates and deprecation rules
-- [RFC-PROCESS.md](../RFC-PROCESS.md) — how RFCs are proposed, reviewed, and decided
-- [PACKAGE-SOURCING.md](../PACKAGE-SOURCING.md) — package origin rules, Tideforge-first, and allowlist (#1319)
-- [TRIAGE-POLICY.md](../TRIAGE-POLICY.md) — triage states and SLAs (adopted, #1195)
-- [FEDORA-BASE-POLICY.md](../FEDORA-BASE-POLICY.md) — adopted N+rawhide sequencing for Fedora-based variants (#1171)
-- [VERSIONING.md](../VERSIONING.md) — tag scheme and stability tiers
-- [MIGRATION.md](../MIGRATION.md) — switching from other distros
-- [SECURITY.md](../SECURITY.md) — vulnerability reporting and supported versions
-- [ADOPTERS.md](../ADOPTERS.md) / [ADOPTION-METRICS.md](../ADOPTION-METRICS.md) — who uses TunaOS and how adoption is measured
-- [COMMUNITY.md](../COMMUNITY.md) — contribution ladder, metrics, communication
-- [MAINTAINERS.md](../MAINTAINERS.md) — maintainer playbook and bus factor plan
-- [CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md) — community standards
-- [Q3_CHECKPOINT-2026-08-22.md](../Q3_CHECKPOINT-2026-08-22.md) — decision sheet for the Q3 "Expand Coverage" milestone (#1299)
+- [`ROADMAP.md`](../ROADMAP.md) — project direction and feature status
+- [`VISION.md`](../VISION.md) — project philosophy
+- [`GOAL.md`](../GOAL.md) — current objective
+- [`CONTRIBUTING.md`](../CONTRIBUTING.md) — how to set up, build, and contribute
+- [`VARIANT-LIFECYCLE.md`](../VARIANT-LIFECYCLE.md) — Stable/Beta/Alpha admission gates and deprecation rules
+- [`RFC-PROCESS.md`](../RFC-PROCESS.md) — how to propose, review, and decide an RFC
+- [`PACKAGE-SOURCING.md`](../PACKAGE-SOURCING.md) — package origin rules, Tideforge-first, and allowlist (#1319)
+- [`TRIAGE-POLICY.md`](../TRIAGE-POLICY.md) — triage states and SLAs (adopted, #1195)
+- [`FEDORA-BASE-POLICY.md`](../FEDORA-BASE-POLICY.md) — the adopted N+rawhide order for Fedora-based variants (#1171)
+- [`VERSIONING.md`](../VERSIONING.md) — tag scheme and stability tiers
+- [`MIGRATION.md`](../MIGRATION.md) — how to move from another distro
+- [`SECURITY.md`](../SECURITY.md) — how to report a vulnerability, and the supported versions
+- [`ADOPTERS.md`](../ADOPTERS.md) / [`ADOPTION-METRICS.md`](../ADOPTION-METRICS.md) — who uses TunaOS, and how the project measures adoption
+- [`COMMUNITY.md`](../COMMUNITY.md) — contribution ladder, metrics, communication
+- [`MAINTAINERS.md`](../MAINTAINERS.md) — maintainer playbook and bus factor plan
+- [`CODE_OF_CONDUCT.md`](../CODE_OF_CONDUCT.md) — community standards
+- [`Q3_CHECKPOINT-2026-08-22.md`](../Q3_CHECKPOINT-2026-08-22.md) — decision sheet for the Q3 "Expand Coverage" milestone (#1299)
 
-For current project priorities see [ROADMAP.md](../ROADMAP.md). For how to build
-and contribute see [CONTRIBUTING.md](../CONTRIBUTING.md).
+For current project priorities see [`ROADMAP.md`](../ROADMAP.md). For how to build
+and contribute see [`CONTRIBUTING.md`](../CONTRIBUTING.md).

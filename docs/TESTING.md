@@ -1,11 +1,11 @@
 # Testing Guide
 
-TunaOS uses a QEMU-based end-to-end test harness to verify ISO images boot correctly and reach the live desktop environment.
+TunaOS uses a test harness on QEMU, end to end, to prove that an ISO image boots correctly and reaches the live desktop.
 
 ## Publish Gating
 
-Nothing user-facing is published without a boot check. The pipeline follows
-Bluefin's testing→stable promotion model:
+The pipeline publishes nothing for a user until a boot check passes. It obeys
+the same promotion model as Bluefin, from the `-testing` tag to the stable one:
 
 | Artifact | Gate | Where |
 |---|---|---|
@@ -13,10 +13,10 @@ Bluefin's testing→stable promotion model:
 | ISOs on R2 / GitHub Releases | ISO is built, boot-verified in QEMU (`scripts/iso-e2e.sh`, readiness marker **or** screenshot-sanity fallback), and only uploaded if the gate passes. | `reusable-build-artifacts.yml`, `publish-iso-groups.yml` |
 | PRs | Build + QEMU boot verification of the locally built image (amd64). | `reusable-build-image.yml` |
 
-The screenshot-sanity fallback exists because the EL10 bootc kernels ship
-`CONFIG_SERIAL_8250=m`, so readiness markers often never reach the serial
-console; a rendered (non-blank) framebuffer captured via `-vga virtio`
-counts as booted, a black/absent one fails the gate.
+The fallback to a screenshot check exists for one reason: the EL10 bootc
+kernels ship `CONFIG_SERIAL_8250=m`, so a readiness marker often never
+reaches the serial console. A framebuffer that `-vga virtio` captures, and
+that is not blank, counts as a boot. A black or absent one fails the gate.
 
 Run the same gates locally:
 
@@ -25,11 +25,11 @@ just verify-disk yellowfin.qcow2      # boot-gate a disk image
 ./scripts/iso-e2e.sh some.iso         # boot-gate an ISO
 ```
 
-Automated screenshots: `weekly-desktop-screenshots.yml` commits real desktop
-captures for every variant × DE to `docs/images/desktops/`, and
-`installer-screenshots.yml` drives the GUI installer and commits the flow
-captures to `docs/images/installer/` (then boot-verifies the disk the
-walkthrough installed).
+Two workflows take the screenshots. `weekly-desktop-screenshots.yml` commits
+a real capture of the desktop, for each pair of variant and DE, to
+`docs/images/desktops/`. `installer-screenshots.yml` drives the GUI installer,
+commits the captures of that flow to `docs/images/installer/`, and then boots
+the disk the walkthrough installed to check it.
 
 Each base-DE pair has a LUKS E2E WebM.
 
@@ -39,7 +39,7 @@ them.
 
 ## ISO End-to-End Tests
 
-The `scripts/iso-e2e.sh` script boots a TunaOS live ISO in QEMU with OVMF (UEFI), waits for the live environment to be ready, captures screenshots, and collects serial logs.
+The `scripts/iso-e2e.sh` script boots a TunaOS live ISO in QEMU under OVMF (UEFI). It waits for the live environment, captures screenshots, and collects the serial logs.
 
 ### Running Locally
 
@@ -62,20 +62,20 @@ Requirements:
 The harness validates:
 1. **Boot success** — ISO reaches the live environment within 90 seconds
 2. **Desktop readiness** — `gdm.service` or equivalent display manager is active
-3. **No critical failures** — no `Failed to start` in the systemd journal
+3. **No important failure** — no `Failed to start` in the systemd journal
 4. **Screenshot capture** — visual confirmation of the desktop
 5. **Serial logs** — full boot output for debugging
 
 ### CI Integration
 
 The `.github/workflows/iso-e2e.yml` workflow runs automatically:
-- **On PRs** that modify build inputs (`Containerfile*`, `build_scripts/**`, `live-iso/**`, `system_files*/**`)
+- **On PRs** that change a build input (`Containerfile*`, `build_scripts/**`, `live-iso/**`, `system_files*/**`)
 - **Weekly** on a schedule for regression detection
 - Posts PR comments with screenshots and serial log summaries
 
 ### Test Artifacts
 
-Test outputs are uploaded as GitHub Actions artifacts:
+The harness uploads its output as artifacts of GitHub Actions:
 - `screenshot.png` — Desktop screenshot via QEMU monitor
 - `serial.log` — Full boot serial console output
 
@@ -93,16 +93,25 @@ Test outputs are uploaded as GitHub Actions artifacts:
 
 ## Functional Checks (per-image, per-desktop)
 
-The boot gate proves an image *boots*; `tests/functional/run.sh` proves features
-a user needs are present and working on the **running** system (tuna-os/tunaos#576).
-It runs over SSH against a booted image — corral VM, gate VM, or local install —
-and emits TAP-style `ok`/`not ok` lines; the exit code is the failure count.
+The boot gate proves that an image *boots*. `tests/functional/run.sh` proves
+that the features a user needs are present, and that they work on the
+**live** system (tuna-os/tunaos#576). It runs over SSH against an image that
+has booted: a corral VM, a gate VM, or a local install. It emits `ok` and
+`not ok` lines in the TAP style, and its exit code is the number of
+failures.
 
-Checks: system running + `graphical.target`; no failed units outside the
-VM-noise allowlist (`libstoragemgmt`, `mcelog`); the desktop's display manager
-active; the desktop's session binary and a session entry present; `bootc
-status` healthy; Flathub configured; and (when a variant is given) `image-info.json`
-+ installer `recipe.json` branding.
+It checks these things:
+
+- The system is up and has reached `graphical.target`.
+- No unit has failed, apart from the units on the allowlist for VM noise,
+  `libstoragemgmt` and `mcelog`.
+- The display manager of the desktop is active.
+- The session binary of the desktop, and an entry for that session, are both
+  present.
+- `bootc status` is healthy.
+- The image holds the configuration for Flathub.
+- When you name a variant, it also checks `image-info.json` and the brand
+  marks in the installer's `recipe.json`.
 
 ```bash
 # Against a corral VM running a booted image. `corral ssh` takes at most one
@@ -117,12 +126,13 @@ scp tests/functional/run.sh root@<guest>:/tmp/ && ssh root@<guest> bash /tmp/run
 FUNCTIONAL_EXPECT_COMPOSEFS=1 tests/functional/run.sh gnome grouper
 ```
 
-`just boot-gate <variant> [flavor]` / `scripts/boot-gate.sh` and CI
-(`reusable-build-image.yml` `verify_boot` step) run this dispatcher
-automatically after their own graphical.target/display-manager checks
-(advisory in `verify_boot` — see the comment in `boot-gate.sh` for the
-overlay-suffix-to-desktop-name mapping and why `*-nvidia`/`*-hwe`/etc. flavors
-still resolve to a bare desktop name run.sh understands).
+Three callers run this dispatcher on their own, after their own checks on
+`graphical.target` and on the display manager: `just boot-gate <variant>
+[flavor]`, `scripts/boot-gate.sh`, and the `verify_boot` step in CI
+(`reusable-build-image.yml`). In `verify_boot` the result is advisory. The
+comment in `boot-gate.sh` maps each overlay suffix to a desktop name. It also
+explains why a `*-nvidia` or `*-hwe` flavor still resolves to a bare desktop
+name that `run.sh` understands.
 
 Run the dispatcher's unit tests with the rest of the suite:
 

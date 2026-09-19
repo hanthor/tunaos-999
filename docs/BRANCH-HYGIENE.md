@@ -8,9 +8,9 @@
 
 ## Purpose
 
-Define branch naming, lifecycle, staleness rules, and automated/manual cleanup procedures for the `tuna-os/tunaos` repository.
+Set the rules for the `tuna-os/tunaos` repository. They cover how to name a branch, how long it lives, and when it goes stale. They also cover how to clean it up, by hand or by machine.
 
-Unmanaged branch accumulation (97+ branches across RFCs, agent runs, and feature experiments) creates contributor friction, obscures active work, and clutters PR targeting. This policy establishes a predictable branch lifecycle so that only active, owned branches remain in the repository.
+Branches build up when nobody manages them. This repository holds more than 97, across RFCs, agent runs, and experiments on a feature. That mass slows a contributor down, hides the live work, and makes it hard to pick a base for a PR. This policy gives each branch a life cycle you can predict, so that only live branches with an owner stay in the repository.
 
 ---
 
@@ -26,26 +26,30 @@ All branches pushed to `tuna-os/tunaos` must follow a recognized prefix conventi
 | **Agent / Automation** | `agent/<name>`, `claude/<name>`, `codex/<name>`, `auto/<name>` | 14 days post-commit | Agent / Initiator | Transient build or experiment branches. Deleted automatically on PR merge or purged when stale. |
 | **Release / Stable** | `release/<version>`, `stable/<version>` | Permanent / Lifecycle | Maintainers | Long-term maintenance refs for stable releases. |
 
-> **Fork-First Policy**: External contributors and agent runs without push access build on their personal forks. Direct upstream branches are reserved for core maintainer workflows, release tags, and tracked RFC proposals.
+> **Fork-First Policy**: a contributor from outside, and an agent run with no push access, both work on a fork of their own. Upstream keeps its own branches for the work of the core maintainers, for release tags, and for an RFC proposal that an issue tracks.
 
 ---
 
 ## Staleness Rules & Triage Cadence
 
-A branch is considered **stale** if it has no new commits for **30 days** (14 days for agent/automation branches) and has no open, active Pull Request.
+A branch goes **stale** when it gets no new commit for **30 days**, and has no open Pull Request that somebody works on. For a branch from an agent, or from automation, the limit is 14 days.
 
 ### Triage & Cleanup Rules
 
 1. **Delete-on-Merge (Automated)**:
-   GitHub's `delete-branch-on-merge` setting is enabled. Merging a Pull Request automatically deletes the head branch from `tuna-os/tunaos`.
+   The `delete-branch-on-merge` setting is on. When somebody merges a Pull Request, GitHub deletes its head branch from `tuna-os/tunaos`.
 
-2. **RFC Branch Disposition Pass**:
-   RFC branches (`rfcNNN-*`) are triaged in accordance with [RFC-PROCESS.md](../RFC-PROCESS.md) during quarterly checkpoints (e.g. 2026-08-22 Q3 checkpoint #1299 / #1363). Branches whose ideas are merged/absorbed, superseded, or abandoned are deleted from upstream.
+2. **The pass that decides the fate of each RFC branch**:
+   At each quarterly checkpoint, the project triages the RFC branches
+   (`rfcNNN-*`). [`RFC-PROCESS.md`](../RFC-PROCESS.md) gives the rules. The Q3 checkpoint of 2026-08-22 is one example (#1299 / #1363). We then delete from upstream each branch whose idea we merged, took in, replaced, or dropped.
 
-3. **Monthly Stale Branch Audit**:
-   As part of the monthly [ADOPTION-METRICS.md](../ADOPTION-METRICS.md) and hygiene reporting cycle (#1174), the active branch count across `tuna-os` authorized repositories is audited:
-   - Stale unmerged feature/fix/agent branches (>30 days inactive) without an open PR are flagged for deletion.
-   - Maintainers or agents run a cleanup pass deleting obsolete tracking branches:
+3. **The monthly audit of stale branches**:
+   One cycle each month reports [`ADOPTION-METRICS.md`](../ADOPTION-METRICS.md)
+   and hygiene (#1174). It also counts the live branches across the
+   authorized `tuna-os` repositories:
+   - It marks a stale branch for deletion when three things hold. Nobody
+     merged it. It got no commit for more than 30 days. It has no open PR.
+   - A maintainer or an agent then runs a pass that deletes each branch we no longer need:
      ```bash
      git push upstream --delete <stale-branch-name>
      ```
@@ -54,7 +58,7 @@ A branch is considered **stale** if it has no new commits for **30 days** (14 da
 
 ## Hygiene Metrics & Reporting
 
-Branch count and stale-branch count are tracked in the monthly maintainer hygiene snapshot alongside release and adoption metrics:
+The monthly snapshot of hygiene for maintainers carries two counts, beside the metrics for the release and for adoption. They are the number of branches, and the number of stale branches.
 
-- **Target**: Maintain ≤ 15 active upstream branches at any given time (excluding permanent release tags/branches).
-- **Metric Linkage**: Reported in the monthly ROADMAP Community & Governance updates (#1174).
+- **Target**: keep 15 live upstream branches or fewer at all times. Do not count a permanent tag or branch for a release.
+- **Where it appears**: in the monthly updates on Community & Governance in the ROADMAP (#1174).

@@ -1,18 +1,18 @@
 # Verify TunaOS artifacts
 
-TunaOS OCI images are signed with Sigstore Cosign's keyless GitHub Actions
-identity. No project signing key or password is required. Verification checks
-both the artifact digest and the identity of the protected workflow that built
-it.
+Sigstore Cosign signs every TunaOS OCI image. It uses the keyless identity
+that GitHub Actions gives it, so this project holds no key and no password for
+this purpose. A check proves the digest of the artifact, and also the identity
+of the protected workflow that built it.
 
 ## Install Cosign
 
-Use Cosign 3.0.6 or newer. Follow the upstream installation instructions and
-verify the Cosign binary before using it.
+Use Cosign 3.0.6 or newer. Obey the install instructions upstream, and verify
+the Cosign binary before you use it.
 
 ## Verify an OCI image
 
-Always resolve and verify an immutable digest, even when starting from a
+Always resolve an immutable digest and verify that, even when you start from a
 friendly tag:
 
 ```bash
@@ -32,7 +32,8 @@ an unrestricted regular expression.
 
 ## Verify the SPDX SBOM attestation
 
-Each published platform image has a signed SPDX JSON attestation:
+Each published platform image carries an attestation in SPDX JSON, and Cosign
+has signed it:
 
 ```bash
 cosign verify-attestation "${ref}" \
@@ -64,7 +65,7 @@ workflow, or another identity provider does not satisfy this policy.
 Every published ISO has two adjacent files:
 
 - `<name>.iso.sha256` — the SHA-256 checksum manifest;
-- `<name>.iso.sigstore.json` — the Cosign v3 keyless verification bundle.
+- `<name>.iso.sigstore.json` — the keyless bundle that Cosign v3 verifies.
 
 Download all three files into the same directory, then run:
 
@@ -79,14 +80,14 @@ cosign verify-blob tunaos-example.iso \
     "https://token.actions.githubusercontent.com"
 ```
 
-Scheduled combined/deduplicated media is produced directly by
-`publish-iso-groups.yml`. For those ISOs, use this exact identity instead:
+`publish-iso-groups.yml` makes the combined media on a schedule, and removes
+the duplicates itself. For those ISOs, use this exact identity instead:
 
 ```text
 https://github.com/tuna-os/tunaOS/.github/workflows/publish-iso-groups.yml@refs/heads/main
 ```
 
-The reusable artifact workflow signs only after the ISO passes its QEMU boot
-gate; the grouped workflow follows the same ordering. The verified ISO,
-checksum, and bundle are then uploaded together. A signing or local
-verification failure prevents publication.
+The reusable workflow for artifacts signs an ISO only after that ISO passes
+its boot gate in QEMU. The grouped workflow obeys the same order. Both then
+upload the verified ISO, the checksum, and the bundle together. If a signature
+or a local check fails, nothing goes out.

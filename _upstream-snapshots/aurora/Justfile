@@ -5,7 +5,7 @@ export base_image_name := env("BASE_IMAGE_NAME", "kinoite")
 
 stable_version := "44"
 latest_version := "44"
-testing_version := "44"
+testing_version := "45"
 
 images := '(
     [aurora]=aurora
@@ -28,9 +28,9 @@ default_tag := "latest"
 default_flavor := "main"
 
 # Build Containers
-chunkah := shell("yq -r \".images[] | select(.name == \\\"chunkah\\\") | \\\"\\\\(.image)@\\\\(.digest)\\\"\" image-versions.yml")
-common := shell("yq -r \".images[] | select(.name == \\\"common\\\") | \\\"\\\\(.image)@\\\\(.digest)\\\"\" image-versions.yml")
-brew := shell("yq -r \".images[] | select(.name == \\\"brew\\\") | \\\"\\\\(.image)@\\\\(.digest)\\\"\" image-versions.yml")
+chunkah := shell("yq -r \".images[] | select(.name == \\\"chunkah\\\") | \\\"\\\\(.image):\\(.tag)@\\\\(.digest)\\\"\" image-versions.yml")
+common := shell("yq -r \".images[] | select(.name == \\\"common\\\") | \\\"\\\\(.image):\\(.tag)@\\\\(.digest)\\\"\" image-versions.yml")
+brew := shell("yq -r \".images[] | select(.name == \\\"brew\\\") | \\\"\\\\(.image):\\(.tag)@\\\\(.digest)\\\"\" image-versions.yml")
 
 export SUDO_DISPLAY := if `if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then echo true; fi` == "true" { "true" } else { "false" }
 export SUDOIF := if `id -u` == "0" { "" } else { "sudo" }
@@ -158,8 +158,8 @@ build $image=default_image $tag=default_tag $flavor=default_flavor $rechunk="fal
       case "${tag}" in
               stable)
                   if [[ "${ARCH}" == "x86_64" ]]; then
-                      # https://github.com/openzfs/zfs/issues/18760
-                      kernel_pin="7.0.12-201.fc44.x86_64"
+                      # <Here is a link why we have it pinned>
+                      kernel_pin=""
                   elif [[ "${ARCH}" == "aarch64" ]]; then
                       kernel_pin=""
                   fi
@@ -182,7 +182,7 @@ build $image=default_image $tag=default_tag $flavor=default_flavor $rechunk="fal
     fi
 
     if [[ -z "${kernel_pin:-}" ]]; then
-        kernel_release=$(skopeo inspect --retry-times 3 docker://ghcr.io/ublue-os/akmods:"${akmods_flavor}"-"${fedora_version}" | jq -r '.Labels["ostree.linux"]')
+        kernel_release=$(skopeo inspect --no-tags --retry-times 3 docker://ghcr.io/ublue-os/akmods:"${akmods_flavor}"-"${fedora_version}" | jq -r '.Labels["ostree.linux"]')
     else
         kernel_release="${kernel_pin}"
     fi
@@ -191,11 +191,6 @@ build $image=default_image $tag=default_tag $flavor=default_flavor $rechunk="fal
 
     AKMODS="${BASENAME_AKMODS}:${akmods_flavor}-${fedora_version}-${kernel_release}"
     ALL_IMAGES+=("${AKMODS}")
-
-    if [[ "${akmods_flavor}" =~ coreos ]]; then
-        AKMODS_ZFS="${BASENAME_AKMODS}-zfs:${akmods_flavor}-${fedora_version}-${kernel_release}"
-        ALL_IMAGES+=("${AKMODS_ZFS}")
-    fi
 
     if [[ "${flavor}" =~ nvidia-open ]]; then
         AKMODS_NVIDIA_OPEN="${BASENAME_AKMODS}-nvidia-open:${akmods_flavor}-${fedora_version}-${kernel_release}"
@@ -286,10 +281,6 @@ build $image=default_image $tag=default_tag $flavor=default_flavor $rechunk="fal
     fi
     LABELS+=("--label" "ostree.linux=${kernel_release}")
 
-    case "${akmods_flavor}" in
-    "coreos-stable") BUILD_ARGS+=("--cpp-flag=-DZFS") ;;
-    esac
-
     if [[ "${image_name}" =~ nvidia ]]; then
         BUILD_ARGS+=("--cpp-flag=-DNVIDIA")
     fi
@@ -341,12 +332,11 @@ rechunk $image=default_image $tag=default_tag $flavor=default_flavor:
     ${PODMAN} run --rm --mount=type=image,src="${image_name}:${tag}",target=/chunkah \
     -v "${CHUNKAH_CONFIG_FILE}:/chunkah-config.json:ro,Z" \
     -v "${CHUNKAH_OUTPUT_DIR}:/run/out:Z" \
-    -e SOURCE_DATE_EPOCH=0 \
     "{{ chunkah }}" \
     build \
     --verbose \
     --compressed \
-    --max-layers 128 \
+    --max-layers 256 \
     --prune /sysroot/ \
     --label ostree.commit- --label ostree.final-diffid- \
     --config /chunkah-config.json \
@@ -634,7 +624,6 @@ generate-build-tags $image=default_image $tag=default_tag $flavor=default_flavor
     # No special handling here for testing for now
     if [[ "{{ tag }}" == stable ]]; then
       # Legacy Compatibility Tag so stable-daily points to stable, do not remove this
-      # TODO: Move this to :latest after the ZFS removal to get daily updates again
       BUILD_TAGS+=("{{ tag }}-daily")
       BUILD_TAGS+=("${version}")
       BUILD_TAGS+=("{{ tag }}-daily-${version}")
@@ -745,10 +734,47 @@ gen-sbom $image=default_image $tag=default_tag $flavor=default_flavor $syft_cmd=
 
     SBOM="${OUT_DIR}/sbom.json"
 
-    ${syft_cmd} --source-name "${image_name}:${tag}" "${OUT_DIR}" -o syft-json=${SBOM}
+    ${syft_cmd} --verbose --source-name "${image_name}:${tag}" "${OUT_DIR}" -o syft-json=${SBOM}
     du -sh "${SBOM}"
 
     rm -rf "${ROOTFS}"
+
+# Attach sbom to exisitng image
+[arg("digest", long="digest")]
+[arg("flavor", long="flavor", short="f")]
+[arg("image", long="image", short="i")]
+[arg("registry", long="registry")]
+[arg("tag", long="tag", short="t")]
+[group('Utility')]
+attach-sbom $image=default_image $tag=default_tag $flavor=default_flavor $registry="" $digest="":
+    #!/usr/bin/env bash
+    set -eoux pipefail
+
+    {{ just }} validate --image "${image}" --tag "${tag}" --flavor "${flavor}"
+    image_name=$({{ just }} image_name --image "${image}" --tag "${tag}" --flavor "${flavor}")
+
+    OUT_DIR="sbom_out/${image_name}"
+    SBOM="sbom.json"
+    FULL_SBOM_PATH="${OUT_DIR}/${SBOM}"
+    IMAGE="${registry}/${image_name}:${tag}@${digest}"
+
+    # we need to be in the directory of the sbom json file or else we end up having the directories in the oci artifact
+    pushd "${OUT_DIR}"
+
+    oras attach \
+      --artifact-type application/vnd.spdx+json \
+      --annotation filename="${SBOM}" \
+      "${IMAGE}" \
+      "${SBOM}"
+
+    popd
+
+    SBOM_DIGEST="$(oras discover --format json "${IMAGE}" | jq -r '.referrers[] | select(.artifactType == "application/vnd.spdx+json") | .digest')"
+
+    echo "${SBOM_DIGEST}" > /tmp/sbom-digestfile
+
+    # debugging
+    echo "oras pull ${registry}/${image_name}:${tag}@${SBOM_DIGEST}"
 
 # We are not using https://github.com/actions/cache because of:
 # https://github.com/ublue-os/aurora/issues/2351
@@ -877,7 +903,7 @@ disk-image $image=default_image $tag=default_tag $flavor=default_flavor $ghcr="f
     if [[ "${backend}" == "ostree" ]]; then
       BOOTC_INSTALL_ARGS+=("--bootloader grub")
     else
-      BOOTC_INSTALL_ARGS+=("--bootloader systemd" "--composefs-backend")
+      BOOTC_INSTALL_ARGS+=("--bootloader grub" "--composefs-backend")
     fi
 
     {{ just }} bootc --image "${image}" --tag "${tag}" --flavor "${flavor}" install to-disk -- "${BOOTC_INSTALL_ARGS[@]}"
@@ -903,8 +929,9 @@ push-image $image=default_image $tag=default_tag $flavor=default_flavor $ghcr="f
     PUSH_CMD_ARGS+=("--digestfile=/tmp/digestfile")
     PUSH_CMD_ARGS+=("--compression-format=zstd")
     PUSH_CMD_ARGS+=("--compression-level=3")
-    PUSH_CMD_ARGS+=("--retry-delay=30s")
-    PUSH_CMD_ARGS+=("--retry=5")
+    # TODO; This has failed already once, investigate if this actually does something and we need to use the retry function
+    PUSH_CMD_ARGS+=("--retry-delay=60s")
+    PUSH_CMD_ARGS+=("--retry=10")
 
     PUSH_CMD=""${PODMAN}" push "${PUSH_CMD_ARGS[@]}""
 

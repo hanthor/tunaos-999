@@ -46,19 +46,19 @@ _Generated from the latest completed main-branch build for each variant. A cell 
 
 | Variant | Green image cells | Latest run | Blocked or failing tags |
 | :--- | ---: | :--- | :--- |
-| 🐠 `yellowfin` | **0/20** | [❌ 2026-11-10](https://github.com/hanthor/tunaos-999/actions/runs/42733902984) | base,base-hwe,base-nvidia,gnome,cosmic,kde,niri,xfce,gnome-hwe,gnome-asahi,gnome-nvidia,gnome-nvidia-hwe,cosmic-hwe,cosmic-nvidia,kde-hwe,kde-nvidia,niri-hwe,niri-nvidia,xfce-hwe,xfce-nvidia |
-| 🐟 `albacore` | **0/20** | [❌ 2026-11-10](https://github.com/hanthor/tunaos-999/actions/runs/42732941394) | base,base-hwe,base-nvidia,gnome,cosmic,kde,niri,xfce,gnome-hwe,gnome-asahi,gnome-nvidia,gnome-nvidia-hwe,cosmic-hwe,cosmic-nvidia,kde-hwe,kde-nvidia,niri-hwe,niri-nvidia,xfce-hwe,xfce-nvidia |
-| 🍣 `skipjack` | **0/18** | [❌ 2026-11-10](https://github.com/hanthor/tunaos-999/actions/runs/42733604591) | base,base-hwe,base-nvidia,gnome,cosmic,kde,niri,xfce,gnome-hwe,gnome-asahi,gnome-nvidia,gnome-nvidia-hwe,cosmic-hwe,cosmic-nvidia,kde-hwe,kde-nvidia,niri-hwe,niri-nvidia |
-| 🎣 `bonito` | **0/15** | [❌ 2026-11-10](https://github.com/hanthor/tunaos-999/actions/runs/42733267488) | base,base-hwe,base-nvidia,gnome,cosmic,kde,niri,xfce,gnome-hwe,gnome-asahi,gnome-nvidia,cosmic-nvidia,kde-nvidia,niri-nvidia,xfce-nvidia |
-| 🐦 `hummingbird` | **0/5** | [❌ 2026-11-10](https://github.com/hanthor/tunaos-999/actions/runs/42733063859) | base,gnome,kde,niri,cosmic |
-| 🦈 `sailfin` | **0/7** | [❌ 2026-11-10](https://github.com/hanthor/tunaos-999/actions/runs/42733760893) | base,gnome,gnome-asahi,kde,niri,xfce,cosmic |
-| 🌈 `guppy` | **0/4** | [❌ 2026-11-10](https://github.com/hanthor/tunaos-999/actions/runs/42733736705) | base,gnome,kde,xfce |
-| 🐉 `bonito-rawhide` | **0/14** | [❌ 2026-11-10](https://github.com/hanthor/tunaos-999/actions/runs/42733517105) | base,base-hwe,base-nvidia,gnome,cosmic,kde,niri,xfce,gnome-hwe,gnome-nvidia,cosmic-nvidia,kde-nvidia,niri-nvidia,xfce-nvidia |
-| 🐟 `gurnard` | **0/2** | [❌ 2026-11-10](https://github.com/hanthor/tunaos-999/actions/runs/42732777207) | base,pantheon |
-| 🐟 `grouper` | **0/7** | [❌ 2026-11-10](https://github.com/hanthor/tunaos-999/actions/runs/42732947463) | base,gnome,gnome-asahi,gnome-zfs,kde,cosmic,xfce |
-| 🚀 `marlin` | **0/12** | [❌ 2026-11-10](https://github.com/hanthor/tunaos-999/actions/runs/42733836232) | base,gnome,gnome-asahi,kde,cosmic,niri,xfce,gnome-cachyos,kde-cachyos,cosmic-cachyos,niri-cachyos,xfce-cachyos |
+| 🐠 `yellowfin` | **0/20** | [❌ 2026-11-11](https://github.com/hanthor/tunaos-999/actions/runs/42937022381) | base,base-hwe,base-nvidia,gnome,cosmic,kde,niri,xfce,gnome-hwe,gnome-asahi,gnome-nvidia,gnome-nvidia-hwe,cosmic-hwe,cosmic-nvidia,kde-hwe,kde-nvidia,niri-hwe,niri-nvidia,xfce-hwe,xfce-nvidia |
+| 🐟 `albacore` | **0/20** | [❌ 2026-11-11](https://github.com/hanthor/tunaos-999/actions/runs/42936137174) | base,base-hwe,base-nvidia,gnome,cosmic,kde,niri,xfce,gnome-hwe,gnome-asahi,gnome-nvidia,gnome-nvidia-hwe,cosmic-hwe,cosmic-nvidia,kde-hwe,kde-nvidia,niri-hwe,niri-nvidia,xfce-hwe,xfce-nvidia |
+| 🍣 `skipjack` | **0/18** | [❌ 2026-11-11](https://github.com/hanthor/tunaos-999/actions/runs/42936754362) | base,base-hwe,base-nvidia,gnome,cosmic,kde,niri,xfce,gnome-hwe,gnome-asahi,gnome-nvidia,gnome-nvidia-hwe,cosmic-hwe,cosmic-nvidia,kde-hwe,kde-nvidia,niri-hwe,niri-nvidia |
+| 🎣 `bonito` | **0/15** | [❌ 2026-11-11](https://github.com/hanthor/tunaos-999/actions/runs/42936438459) | base,base-hwe,base-nvidia,gnome,cosmic,kde,niri,xfce,gnome-hwe,gnome-asahi,gnome-nvidia,cosmic-nvidia,kde-nvidia,niri-nvidia,xfce-nvidia |
+| 🐦 `hummingbird` | **0/5** | [❌ 2026-11-11](https://github.com/hanthor/tunaos-999/actions/runs/42936231773) | base,gnome,kde,niri,cosmic |
+| 🦈 `sailfin` | **0/7** | [❌ 2026-11-11](https://github.com/hanthor/tunaos-999/actions/runs/42936910654) | base,gnome,gnome-asahi,kde,niri,xfce,cosmic |
+| 🌈 `guppy` | **0/4** | [❌ 2026-11-11](https://github.com/hanthor/tunaos-999/actions/runs/42936867675) | base,gnome,kde,xfce |
+| 🐉 `bonito-rawhide` | **0/14** | [❌ 2026-11-11](https://github.com/hanthor/tunaos-999/actions/runs/42936670029) | base,base-hwe,base-nvidia,gnome,cosmic,kde,niri,xfce,gnome-hwe,gnome-nvidia,cosmic-nvidia,kde-nvidia,niri-nvidia,xfce-nvidia |
+| 🐟 `gurnard` | **0/2** | [❌ 2026-11-11](https://github.com/hanthor/tunaos-999/actions/runs/42935936822) | base,pantheon |
+| 🐟 `grouper` | **0/7** | [❌ 2026-11-11](https://github.com/hanthor/tunaos-999/actions/runs/42936136262) | base,gnome,gnome-asahi,gnome-zfs,kde,cosmic,xfce |
+| 🚀 `marlin` | **0/12** | [❌ 2026-11-11](https://github.com/hanthor/tunaos-999/actions/runs/42936966745) | base,gnome,gnome-asahi,kde,cosmic,niri,xfce,gnome-cachyos,kde-cachyos,cosmic-cachyos,niri-cachyos,xfce-cachyos |
 | 🐡 `flounder` | **0/5** | [❌ 2026-11-10](https://github.com/hanthor/tunaos-999/actions/runs/42733638090) | base,gnome,gnome-asahi,kde,xfce |
-| ☢️ `flounder-sid` | **0/4** | [❌ 2026-11-10](https://github.com/hanthor/tunaos-999/actions/runs/42733004245) | base,gnome,kde,xfce |
+| ☢️ `flounder-sid` | **0/4** | [❌ 2026-11-11](https://github.com/hanthor/tunaos-999/actions/runs/42936146250) | base,gnome,kde,xfce |
 
 **Current image coverage: 0/133 cells (0%).** This is a point-in-time CI snapshot, not a support-tier promise.
 

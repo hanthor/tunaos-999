@@ -1,7 +1,7 @@
 {
   "upstream": "https://github.com/ublue-os/bluefin-lts.git",
   "branch": "main",
-  "sha": "1d68ddeadb4020d72c82f090bc91d92332982906",
-  "synced_at": "2026-08-03T12:11:39Z",
+  "sha": "0b4ecb1690f27c0eb124c0df1a435b9622bde894",
+  "synced_at": "2026-11-16T09:16:58Z",
   "paths": "build_scripts:system_files:Containerfile:Justfile:image-versions.yml"
 }

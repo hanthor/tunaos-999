@@ -22,7 +22,7 @@ fi
 # fedora-nvidia repo.  Detect the Fedora release embedded in the akmods
 # RPMs and download the matching repo file so DNF can resolve it.
 FEDORA_VERSION="${FEDORA_AKMODS_VERSION:-43}"
-AKMODS_FEDORA_VERSION="$(find /tmp/akmods-nvidia-open-rpms -name "*.rpm" -print | grep -oPm1 '(?<=\.fc)\d+' || true)"
+AKMODS_FEDORA_VERSION="$(find /tmp/akmods-nvidia-open-rpms -name "*.rpm" -print | grep -oPm1 '(?<=\.fc)\d+' | head -n1 || true)"
 if [[ -n "${AKMODS_FEDORA_VERSION}" ]]; then
     FEDORA_VERSION="${AKMODS_FEDORA_VERSION}"
 fi
@@ -32,6 +32,11 @@ dnf config-manager --set-disabled "fedora-nvidia"
 dnf -y install --enablerepo="fedora-nvidia" \
     /tmp/akmods-nvidia-open-rpms/kmods/kmod-nvidia-"${KERNEL_VRA}"-*.rpm \
     /tmp/akmods-nvidia-open-rpms/ublue-os/*.rpm
+# From Fedora 45 on, ublue-os-nvidia-addons ships its repo files in
+# /usr/share/dnf5/repos.d, which CentOS's dnf doesn't read. Copy the one used here.
+if [[ ! -f /etc/yum.repos.d/nvidia-container-toolkit.repo && -f /usr/share/dnf5/repos.d/nvidia-container-toolkit.repo ]]; then
+    cp /usr/share/dnf5/repos.d/nvidia-container-toolkit.repo /etc/yum.repos.d/
+fi
 dnf config-manager --set-enabled "nvidia-container-toolkit"
 # Get the kmod-nvidia version to ensure driver packages match
 KMOD_VERSION="$(rpm -q --queryformat '%{VERSION}' kmod-nvidia)"
@@ -65,7 +70,7 @@ EOF
 # disable repos provided by ublue-os-nvidia-addons
 dnf config-manager --set-disabled nvidia-container-toolkit
 
-systemctl enable ublue-nvctk-cdi.service
+systemctl enable nvidia-cdi-refresh.path nvidia-cdi-refresh.service
 semodule --verbose --install /usr/share/selinux/packages/nvidia-container.pp
 
 # Universal Blue specific Initramfs fixes

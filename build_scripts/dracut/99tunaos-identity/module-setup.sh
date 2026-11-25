@@ -33,8 +33,7 @@ install() {
 	host="$(sed -n 's/^DEFAULT_HOSTNAME=//p' "${dracutsysrootdir-}/usr/lib/os-release" | tail -n 1 | tr -d "\"'")"
 	[[ -n "$host" ]] || return 0
 	name="${host^}"
-	sed -i -e "s|^NAME=.*|NAME=\"${name}\"|" \
-		-e "s|^PRETTY_NAME=.*|PRETTY_NAME=\"${name} (Initramfs)\"|" \
-		-e '/^DEFAULT_HOSTNAME=/d' "$release"
-	printf 'DEFAULT_HOSTNAME="%s"\n' "$host" >>"$release"
+	sed -i -e '/^NAME=/d' -e '/^PRETTY_NAME=/d' -e '/^DEFAULT_HOSTNAME=/d' "$release"
+	# Append, not substitute: Debian's dracut writes no PRETTY_NAME line.
+	printf 'NAME="%s"\nPRETTY_NAME="%s (Initramfs)"\nDEFAULT_HOSTNAME="%s"\n' "$name" "$name" "$host" >>"$release"
 }
